@@ -58,16 +58,13 @@ if st.button("Train Model"):
     mlflow.end_run()
     pass
 
-
 # Save model to MLFlow Model Artifacts Register
 st.header("Step #3: MLFlow Model Artifacts")
 st.download_button('Download Model', "some_model.tflite")
 
-
 # Adding image.
 image_url = "https://github.com/fentresspaul61B/Image_Files/raw/main/Screenshot 2023-01-03 at 10.28.32 AM.png"
 st.image(image_url, width=None)
-
 
 if __name__ == "__main__":
     pass
