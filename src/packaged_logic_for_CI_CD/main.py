@@ -84,8 +84,19 @@ def read_audio(pathname, conf=conf, trim_long_data=False):
 
 
 def audio_array_to_melspectrogram_array(audio_array, conf=conf):
-    """Feature extraction function that takes in an audio array, and returns
-    an array which is the spectrogram of that audio array."""
+    """
+    Extract mel-scaled spectrogram features from audio data.
+
+    Parameters:
+    - audio_array (np.ndarray): Audio data in the form of a 1-D numpy array.
+    - conf (object, optional): Configuration object containing relevant parameters
+        for feature extraction. If not provided, the default configuration `conf`
+        will be used.
+
+    Returns:
+    - spectrogram (np.ndarray): Mel-scaled spectrogram of the input audio, with
+        shape (n_mels, t).
+    """
     spectrogram = librosa.feature.melspectrogram(
                     audio_array,
                     sr=conf.sampling_rate,
