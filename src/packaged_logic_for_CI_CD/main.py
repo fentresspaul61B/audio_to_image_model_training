@@ -32,6 +32,7 @@ def is_valid_wav_file(filename):
         with wave.open(filename, 'rb') as wav_file:
             # Read the first chunk of the WAV file to check that it is a valid WAV file.
             wav_file.readframes(1)
+            return True
     except wave.Error:
         return False
 
@@ -55,7 +56,7 @@ def read_audio(pathname, conf=conf, trim_long_data=False):
     """
 
     # Validating that the incoming data is a .wav file. If not raises error.
-    # is_valid_wav_file(pathname)
+    is_valid_wav_file(pathname)
 
     audio_array, sample_rate = librosa.load(pathname, sr=conf.sampling_rate)
 
@@ -83,6 +84,33 @@ def read_audio(pathname, conf=conf, trim_long_data=False):
     return audio_array
 
 
+def audio_array_to_melspectrogram_array(audio_array, conf=conf):
+    """
+    Extract mel-scaled spectrogram features from audio data.
+
+    Parameters:
+    - audio_array (np.ndarray): Audio data in the form of a 1-D numpy array.
+    - conf (object, optional): Configuration object containing relevant parameters
+        for feature extraction. If not provided, the default configuration `conf`
+        will be used.
+
+    Returns:
+    - spectrogram (np.ndarray): Mel-scaled spectrogram of the input audio, with
+        shape (n_mels, t).
+    """
+    spectrogram = librosa.feature.melspectrogram(
+                    audio_array,
+                    sr=conf.sampling_rate,
+                    n_mels=conf.n_mels,
+                    hop_length=conf.hop_length,
+                    n_fft=conf.n_fft,
+                    fmin=conf.fmin,
+                    fmax=conf.fmax)
+    spectrogram = librosa.power_to_db(spectrogram)
+    spectrogram = spectrogram.astype(np.float32)
+    return spectrogram
+
+
 def func1(num: float) -> float:
     """Multiply the num by 2."""
     return num * 2
@@ -96,8 +124,7 @@ def func2(num: float) -> float:
 def main():
     # test_audio = read_audio("tests/test_data/invalid_data.wav")
     # test_audio_2 = read_audio("tests/test_data/valid_data.wav")
-    # print(test_audio == False)
-    # print("Code finished.")
+    # print(type(audio_to_melspectrogram(test_audio_2)))
     pass
 
 
