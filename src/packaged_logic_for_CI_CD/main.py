@@ -17,6 +17,7 @@ class conf:
     n_fft = n_mels * 20
     samples = sampling_rate * duration
 
+
 def is_valid_wav_file(filename):
     """
     Validate that a file is a valid WAV file.
@@ -33,6 +34,7 @@ def is_valid_wav_file(filename):
             wav_file.readframes(1)
     except wave.Error:
         return False
+
 
 def read_audio(pathname, conf=conf, trim_long_data=False):
     """
@@ -92,8 +94,7 @@ def func2(num: float) -> float:
 
 
 def main():
-    test_audio = read_audio("tests/test_data/invalid_data.wav")
-
+    # test_audio = read_audio("tests/test_data/invalid_data.wav")
     # print(test_audio == False)
     # print("Code finished.")
     pass

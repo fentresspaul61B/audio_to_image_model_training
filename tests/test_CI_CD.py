@@ -1,7 +1,6 @@
 from src.packaged_logic_for_CI_CD.main import func1, func2, read_audio  # Functions for testing.
 import numpy as np  # Use for testing arrays.
 import unittest  # Used for writing unit test.
-import wave  # Used for testing valid wav files.
 
 TEST_VALID_AUDIO_FILE = "tests/test_data/cat_audio_for_testing.wav"
 TEST_INVALID_AUDIO_FILE = "tests/test_data/invalid_data.wav"
