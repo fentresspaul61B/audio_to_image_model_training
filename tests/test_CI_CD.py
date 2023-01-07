@@ -40,3 +40,8 @@ class TestReadAudio(unittest.TestCase):
             audio_array = read_audio(TEST_INVALID_AUDIO_FILE)
             self.assertFalse(isinstance(audio_array, np.ndarray))
     pass
+
+
+class TestMelSpectrogram(unittest.TestCase):
+    def test_mel_valid_audio(self):
+        pass
