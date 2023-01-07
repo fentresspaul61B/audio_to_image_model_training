@@ -1,5 +1,6 @@
 import librosa
 import numpy as np
+import wave
 
 
 # A set of settings that you can adapt to fit your audio files (frequency, average duration, number of Fourier
@@ -16,19 +17,45 @@ class conf:
     n_fft = n_mels * 20
     samples = sampling_rate * duration
 
+def is_valid_wav_file(filename):
+    """
+    Validate that a file is a valid WAV file.
 
-def read_audio(pathname, conf=conf, trim_long_data=False):
-    """Reads in the path to a wav file, and returns an audio array."""
+    Parameters:
+    - filename (str): The name of the file to be validated.
 
-    # Validating that the incoming data is a .wav file.
+    Returns:
+    - True if the file is a valid WAV file, False otherwise.
+    """
     try:
-        audio_array, sample_rate = librosa.load(pathname, sr=conf.sampling_rate)
-        pass
-
-    except Exception:
+        with wave.open(filename, 'rb') as wav_file:
+            # Read the first chunk of the WAV file to check that it is a valid WAV file.
+            wav_file.readframes(1)
+    except wave.Error:
         return False
 
-    # audio_array, sample_rate = librosa.load(pathname, sr=conf.sampling_rate)
+def read_audio(pathname, conf=conf, trim_long_data=False):
+    """
+    Read in an audio file and return a NumPy array representing the audio data.
+
+    Parameters:
+    - pathname (str): Path to the audio file to be read.
+    - conf (object): Configuration object with settings for audio processing.
+    - trim_long_data (bool): If True, trim audio data that is longer than the
+      specified length in 'conf'. If False, pad shorter audio data with zeros
+      to reach the specified length.
+
+    Returns:
+    - audio_array (np.ndarray): NumPy array representing the audio data.
+
+    Raises:
+    - Exception: If the audio file is not a valid .wav file.
+    """
+
+    # Validating that the incoming data is a .wav file. If not raises error.
+    # is_valid_wav_file(pathname)
+
+    audio_array, sample_rate = librosa.load(pathname, sr=conf.sampling_rate)
 
     # trim silence
     if 0 < len(audio_array):
@@ -65,7 +92,8 @@ def func2(num: float) -> float:
 
 
 def main():
-    # test_audio = read_audio("tests/test_data/invalid_data.wav")
+    test_audio = read_audio("tests/test_data/invalid_data.wav")
+
     # print(test_audio == False)
     # print("Code finished.")
     pass
