@@ -102,8 +102,3 @@ virtualenv==20.16.2
 websocket-client==1.4.2
 Werkzeug==2.2.2
 zipp==3.11.0
-flake8
-tox
-pytest==7.2.0
-pytest-cov==4.0.0
-mypy==0.991

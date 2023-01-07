@@ -95,6 +95,7 @@ def func2(num: float) -> float:
 
 def main():
     # test_audio = read_audio("tests/test_data/invalid_data.wav")
+    # test_audio_2 = read_audio("tests/test_data/valid_data.wav")
     # print(test_audio == False)
     # print("Code finished.")
     pass
