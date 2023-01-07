@@ -1,8 +1,9 @@
-from src.packaged_logic_for_CI_CD.main import func1, func2, read_audio  # Functions for testing.
+from src.packaged_logic_for_CI_CD.main import func1, func2, read_audio
+from src.packaged_logic_for_CI_CD.main import audio_array_to_melspectrogram_array
 import numpy as np  # Use for testing arrays.
 import unittest  # Used for writing unit test.
 
-TEST_VALID_AUDIO_FILE = "tests/test_data/cat_audio_for_testing.wav"
+TEST_VALID_AUDIO_FILE = "tests/test_data/valid_data.wav"
 TEST_INVALID_AUDIO_FILE = "tests/test_data/invalid_data.wav"
 
 
@@ -44,4 +45,7 @@ class TestReadAudio(unittest.TestCase):
 
 class TestMelSpectrogram(unittest.TestCase):
     def test_mel_valid_audio(self):
+        audio_array = read_audio(TEST_VALID_AUDIO_FILE)
+        mel_spectrogram = audio_array_to_melspectrogram_array(audio_array)
+        self.assertTrue(isinstance(mel_spectrogram, np.ndarray))
         pass

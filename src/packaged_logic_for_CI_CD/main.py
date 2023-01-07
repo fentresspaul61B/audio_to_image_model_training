@@ -83,6 +83,22 @@ def read_audio(pathname, conf=conf, trim_long_data=False):
     return audio_array
 
 
+def audio_array_to_melspectrogram_array(audio_array, conf=conf):
+    """Feature extraction function that takes in an audio array, and returns
+    an array which is the spectrogram of that audio array."""
+    spectrogram = librosa.feature.melspectrogram(
+                    audio_array,
+                    sr=conf.sampling_rate,
+                    n_mels=conf.n_mels,
+                    hop_length=conf.hop_length,
+                    n_fft=conf.n_fft,
+                    fmin=conf.fmin,
+                    fmax=conf.fmax)
+    spectrogram = librosa.power_to_db(spectrogram)
+    spectrogram = spectrogram.astype(np.float32)
+    return spectrogram
+
+
 def func1(num: float) -> float:
     """Multiply the num by 2."""
     return num * 2
@@ -96,8 +112,7 @@ def func2(num: float) -> float:
 def main():
     # test_audio = read_audio("tests/test_data/invalid_data.wav")
     # test_audio_2 = read_audio("tests/test_data/valid_data.wav")
-    # print(test_audio == False)
-    # print("Code finished.")
+    # print(type(audio_to_melspectrogram(test_audio_2)))
     pass
 
 
