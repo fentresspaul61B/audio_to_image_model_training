@@ -1,5 +1,9 @@
 flake8
+scipy
+setuptools
 tox
 pytest==7.2.0
 pytest-cov==4.0.0
 mypy==0.991
+librosa
+numpy
