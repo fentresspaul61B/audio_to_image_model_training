@@ -32,6 +32,7 @@ def is_valid_wav_file(filename):
         with wave.open(filename, 'rb') as wav_file:
             # Read the first chunk of the WAV file to check that it is a valid WAV file.
             wav_file.readframes(1)
+            return True
     except wave.Error:
         return False
 
@@ -55,7 +56,7 @@ def read_audio(pathname, conf=conf, trim_long_data=False):
     """
 
     # Validating that the incoming data is a .wav file. If not raises error.
-    # is_valid_wav_file(pathname)
+    is_valid_wav_file(pathname)
 
     audio_array, sample_rate = librosa.load(pathname, sr=conf.sampling_rate)
 
