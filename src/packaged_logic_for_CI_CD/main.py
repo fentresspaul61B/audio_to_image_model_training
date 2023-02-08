@@ -3,13 +3,13 @@ import numpy as np
 import wave
 
 
-# A set of settings that you can adapt to fit your audio files (frequency, average duration, number of Fourier
-# transforms...)
+# A set of settings that you can adapt to fit your audio files
+# (frequency, average duration, number of Fourier, transforms...)
 class conf:
     # Preprocessing settings
     sampling_rate = 44100
     duration = 2
-    hop_length = 347*duration  # to make time steps 128
+    hop_length = 347 * duration  # to make time steps 128
     fmin = 20
     fmax = sampling_rate // 2
     n_mels = 128
@@ -71,15 +71,16 @@ def read_audio(pathname, conf=conf, trim_long_data=False):
 
         # long enough
         if trim_long_data:
-
             # adding audio data to array.
-            audio_array = audio_array[0:0+conf.samples]
+            audio_array = audio_array[0:0 + conf.samples]
 
     # If audio not long enough, add padding on both sides of array.
     else:
         padding = conf.samples - len(audio_array)
         offset = padding // 2
-        audio_array = np.pad(audio_array, (offset, conf.samples - len(audio_array) - offset), 'constant')
+        audio_array = np.pad(audio_array,
+                             (offset, conf.samples - len(audio_array) - offset),
+                             'constant')
 
     return audio_array
 
@@ -99,13 +100,13 @@ def audio_array_to_melspectrogram_array(audio_array, conf=conf):
         shape (n_mels, t).
     """
     spectrogram = librosa.feature.melspectrogram(
-                    audio_array,
-                    sr=conf.sampling_rate,
-                    n_mels=conf.n_mels,
-                    hop_length=conf.hop_length,
-                    n_fft=conf.n_fft,
-                    fmin=conf.fmin,
-                    fmax=conf.fmax)
+        y=audio_array,
+        sr=conf.sampling_rate,
+        n_mels=conf.n_mels,
+        hop_length=conf.hop_length,
+        n_fft=conf.n_fft,
+        fmin=conf.fmin,
+        fmax=conf.fmax)
     spectrogram = librosa.power_to_db(spectrogram)
     spectrogram = spectrogram.astype(np.float32)
     return spectrogram
