@@ -5,7 +5,7 @@ import wave
 
 # A set of settings that you can adapt to fit your audio files
 # (frequency, average duration, number of Fourier, transforms...)
-class conf:
+class Conf:
     # Preprocessing settings
     sampling_rate = 44100
     duration = 2
@@ -37,7 +37,7 @@ def is_valid_wav_file(filename):
         return False
 
 
-def read_audio(pathname, conf=conf, trim_long_data=False):
+def read_audio(pathname, conf=Conf, trim_long_data=False):
     """
     Read in an audio file and return a NumPy array representing the audio data.
 
@@ -85,7 +85,7 @@ def read_audio(pathname, conf=conf, trim_long_data=False):
     return audio_array
 
 
-def audio_array_to_melspectrogram_array(audio_array, conf=conf):
+def audio_array_to_melspectrogram_array(audio_array, conf=Conf):
     """
     Extract mel-scaled spectrogram features from audio data.
 
@@ -110,6 +110,29 @@ def audio_array_to_melspectrogram_array(audio_array, conf=conf):
     spectrogram = librosa.power_to_db(spectrogram)
     spectrogram = spectrogram.astype(np.float32)
     return spectrogram
+
+
+def audio_array_to_MFCC(audio_array, conf=Conf):
+    """
+    Feature extraction function that takes in an audio array, and returns
+    an array which is the MFCC of that audio array.
+    Args:
+        audio_array: numpy array of audio. 1D.
+        Conf: audio configurations used to read audio.
+    Returns:
+        mfcc: An array that represents the mfcc of the input.
+    """
+    mfcc = librosa.feature.mfcc(
+        y=audio_array,
+        sr=conf.sampling_rate,
+        n_mfcc=Conf.n_mfccs,
+        hop_length=Conf.hop_length,
+        n_fft=Conf.n_fft,
+        fmin=Conf.fmin,
+        fmax=Conf.fmax)
+    mfcc = librosa.power_to_db(mfcc)
+    mfcc = mfcc.astype(np.float32)
+    return mfcc
 
 
 def func1(num: float) -> float:
