@@ -112,7 +112,7 @@ def audio_array_to_melspectrogram_array(audio_array, conf=Conf):
     return spectrogram
 
 
-def audio_array_to_MFCC(audio_array, conf=Conf):
+def audio_array_to_mfcc_array(audio_array, conf=Conf):
     """
     Feature extraction function that takes in an audio array, and returns
     an array which is the MFCC of that audio array.
@@ -133,6 +133,26 @@ def audio_array_to_MFCC(audio_array, conf=Conf):
     mfcc = librosa.power_to_db(mfcc)
     mfcc = mfcc.astype(np.float32)
     return mfcc
+
+
+def audio_array_to_chroma_array(audio_array, conf=Conf):
+    """
+    Feature extraction function that takes in an audio array, and returns
+    an array which is the chroma_stft of that audio array.
+    Args:
+        audio_array: numpy array of audio. 1D.
+        conf: audio configurations used to read audio.
+    Returns:
+        chroma: An array that represents the chroma_stft of the input.
+    """
+    chroma = librosa.feature.chroma_stft(
+        y=audio_array,
+        sr=conf.sampling_rate,
+        hop_length=Conf.hop_length,
+        n_fft=Conf.n_fft)
+    chroma = librosa.power_to_db(chroma)
+    chroma = chroma.astype(np.float32)
+    return chroma
 
 
 def func1(num: float) -> float:

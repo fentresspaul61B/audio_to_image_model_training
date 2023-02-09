@@ -1,5 +1,6 @@
 from src.packaged_logic_for_CI_CD.main import func1, func2, read_audio
-from src.packaged_logic_for_CI_CD.main import audio_array_to_melspectrogram_array, audio_array_to_MFCC
+from src.packaged_logic_for_CI_CD.main import audio_array_to_melspectrogram_array, audio_array_to_mfcc_array
+from src.packaged_logic_for_CI_CD.main import audio_array_to_chroma_array
 import numpy as np  # Use for testing arrays.
 import unittest  # Used for writing unit test.
 TEST_VALID_AUDIO_FILE = "tests/test_data/valid_data.wav"
@@ -65,7 +66,7 @@ class TestMFCC(unittest.TestCase):
         is a numpy array, and that it is not mostly or all zeros.
         """
         audio_array = read_audio(TEST_VALID_AUDIO_FILE)
-        mfcc = audio_array_to_MFCC(audio_array)
+        mfcc = audio_array_to_mfcc_array(audio_array)
         self.assertTrue(isinstance(mfcc, np.ndarray))
 
         non_zero_values = [x for x in mfcc if abs(x.all()) > 0]
@@ -73,3 +74,23 @@ class TestMFCC(unittest.TestCase):
 
         self.assertTrue(ratio_of_non_zero_values > 0.5, "Array contains mostly zeros")
         self.assertTrue(len(non_zero_values) > 0, "Array contains all zeros")
+
+
+class TestChroma(unittest.TestCase):
+    def test_chroma_valid_audio(self):
+        """
+        Test that audio to chroma conversion returns a valid numpy array
+        and that it is not mostly or all zeros. This test reads an audio file
+        and converts it to a chromagram representation. It then checks that
+        the resulting chroma representation is a numpy array, and that it
+        is not all zeros, and that it contains some non zero values.
+        """
+        audio_array = read_audio(TEST_VALID_AUDIO_FILE)
+        chroma = audio_array_to_chroma_array(audio_array)
+        self.assertTrue(isinstance(chroma, np.ndarray))
+
+        non_zero_values = [x for x in chroma if abs(x.all()) > 0]
+        ratio_of_non_zero_values = len(non_zero_values) / len(chroma)
+
+        self.assertTrue(len(non_zero_values) > 0, "Array contains all zeros")
+        self.assertTrue(ratio_of_non_zero_values > 0.01, "Array contains some values")
