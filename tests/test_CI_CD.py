@@ -84,4 +84,3 @@ class TestChroma(BaseAudioRepresentationTest):
         audio_array = read_audio(TEST_VALID_AUDIO_FILE)
         chroma = audio_array_to_chroma_array(audio_array)
         self.check_representation_validity(chroma)
-
