@@ -1,5 +1,5 @@
 from src.packaged_logic_for_CI_CD.main import func1, func2, read_audio
-from src.packaged_logic_for_CI_CD.main import audio_array_to_melspectrogram_array, audio_array_to_mfcc_array
+from src.packaged_logic_for_CI_CD.main import audio_array_to_mel_spectrogram_array, audio_array_to_mfcc_array
 from src.packaged_logic_for_CI_CD.main import audio_array_to_chroma_array
 import numpy as np  # Use for testing arrays.
 import unittest  # Used for writing unit test.
@@ -43,54 +43,44 @@ class TestReadAudio(unittest.TestCase):
     pass
 
 
-class TestMelSpectrogram(unittest.TestCase):
-    def test_mel_valid_audio(self):
-        audio_array = read_audio(TEST_VALID_AUDIO_FILE)
-        mel_spectrogram = audio_array_to_melspectrogram_array(audio_array)
-        self.assertTrue(isinstance(mel_spectrogram, np.ndarray))
-
-        non_zero_values = [x for x in mel_spectrogram if abs(x.all()) > 0]
-        ratio_of_non_zero_values = len(non_zero_values) / len(mel_spectrogram)
-
-        self.assertTrue(ratio_of_non_zero_values > 0.5, "Array contains mostly zeros")
-        self.assertTrue(len(non_zero_values) > 0, "Array contains all zeros")
-
-
-class TestMFCC(unittest.TestCase):
-    def test_mfcc_valid_audio(self):
+class BaseAudioRepresentationTest(unittest.TestCase):
+    def check_representation_validity(self, audio_representation):
         """
-        Test that audio array to MFCC conversion returns a valid numpy array
-        and that it is not mostly or all zeros. This test reads an audio file
-        and converts it to a Mel-frequency cepstral coefficients (MFCC)
-        representation. It then checks that the resulting MFCC representation
-        is a numpy array, and that it is not mostly or all zeros.
+        Check if the given audio representation is a valid numpy array and contains non-zero values.
+
+        Parameters:
+        audio_representation : np.ndarray
+            The audio representation to be checked for validity.
+
+        Raises:
+            AssertionError: If `audio_representation` is not a numpy array, or if it contains all zeros,
+            or if the ratio of non-zero values is less than 1%.
         """
-        audio_array = read_audio(TEST_VALID_AUDIO_FILE)
-        mfcc = audio_array_to_mfcc_array(audio_array)
-        self.assertTrue(isinstance(mfcc, np.ndarray))
+        self.assertTrue(isinstance(audio_representation, np.ndarray))
 
-        non_zero_values = [x for x in mfcc if abs(x.all()) > 0]
-        ratio_of_non_zero_values = len(non_zero_values) / len(mfcc)
-
-        self.assertTrue(ratio_of_non_zero_values > 0.5, "Array contains mostly zeros")
-        self.assertTrue(len(non_zero_values) > 0, "Array contains all zeros")
-
-
-class TestChroma(unittest.TestCase):
-    def test_chroma_valid_audio(self):
-        """
-        Test that audio to chroma conversion returns a valid numpy array
-        and that it is not mostly or all zeros. This test reads an audio file
-        and converts it to a chromagram representation. It then checks that
-        the resulting chroma representation is a numpy array, and that it
-        is not all zeros, and that it contains some non zero values.
-        """
-        audio_array = read_audio(TEST_VALID_AUDIO_FILE)
-        chroma = audio_array_to_chroma_array(audio_array)
-        self.assertTrue(isinstance(chroma, np.ndarray))
-
-        non_zero_values = [x for x in chroma if abs(x.all()) > 0]
-        ratio_of_non_zero_values = len(non_zero_values) / len(chroma)
+        non_zero_values = [x for x in audio_representation if abs(x.all()) > 0]
+        ratio_of_non_zero_values = len(non_zero_values) / len(audio_representation)
 
         self.assertTrue(len(non_zero_values) > 0, "Array contains all zeros")
         self.assertTrue(ratio_of_non_zero_values > 0.01, "Array contains some values")
+
+
+class TestMelSpectrogram(BaseAudioRepresentationTest):
+    def test_mel_valid_audio(self):
+        audio_array = read_audio(TEST_VALID_AUDIO_FILE)
+        mel_spectrogram = audio_array_to_mel_spectrogram_array(audio_array)
+        self.check_representation_validity(mel_spectrogram)
+
+
+class TestMFCC(BaseAudioRepresentationTest):
+    def test_mfcc_valid_audio(self):
+        audio_array = read_audio(TEST_VALID_AUDIO_FILE)
+        mfcc = audio_array_to_mfcc_array(audio_array)
+        self.check_representation_validity(mfcc)
+
+
+class TestChroma(BaseAudioRepresentationTest):
+    def test_chroma_valid_audio(self):
+        audio_array = read_audio(TEST_VALID_AUDIO_FILE)
+        chroma = audio_array_to_chroma_array(audio_array)
+        self.check_representation_validity(chroma)

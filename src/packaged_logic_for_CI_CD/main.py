@@ -3,9 +3,11 @@ import numpy as np
 import wave
 
 
-# A set of settings that you can adapt to fit your audio files
-# (frequency, average duration, number of Fourier, transforms...)
 class Conf:
+    """
+    A set of settings that you can adapt to fit your audio files
+    (frequency, average duration, number of Fourier, transforms...)
+    """
     # Preprocessing settings
     sampling_rate = 44100
     duration = 2
@@ -23,10 +25,10 @@ def is_valid_wav_file(filename):
     Validate that a file is a valid WAV file.
 
     Parameters:
-    - filename (str): The name of the file to be validated.
+        filename (str): The name of the file to be validated.
 
     Returns:
-    - True if the file is a valid WAV file, False otherwise.
+        True if the file is a valid WAV file, False otherwise.
     """
     try:
         with wave.open(filename, 'rb') as wav_file:
@@ -35,6 +37,7 @@ def is_valid_wav_file(filename):
             return True
     except wave.Error:
         return False
+    pass
 
 
 def read_audio(pathname, conf=Conf, trim_long_data=False):
@@ -42,61 +45,57 @@ def read_audio(pathname, conf=Conf, trim_long_data=False):
     Read in an audio file and return a NumPy array representing the audio data.
 
     Parameters:
-    - pathname (str): Path to the audio file to be read.
-    - conf (object): Configuration object with settings for audio processing.
-    - trim_long_data (bool): If True, trim audio data that is longer than the
-      specified length in 'conf'. If False, pad shorter audio data with zeros
-      to reach the specified length.
+        pathname (str): Path to the audio file to be read.
+        conf (object): Configuration object with settings for audio processing.
+        trim_long_data (bool): If True, trim audio data that is longer than the
+        specified length in 'conf'. If False, pad shorter audio data with zeros
+        to reach the specified length.
 
     Returns:
-    - audio_array (np.ndarray): NumPy array representing the audio data.
+        audio_array (np.ndarray): NumPy array representing the audio data.
 
     Raises:
-    - Exception: If the audio file is not a valid .wav file.
+        Exception: If the audio file is not a valid .wav file.
     """
 
     # Validating that the incoming data is a .wav file. If not raises error.
     is_valid_wav_file(pathname)
-
     audio_array, sample_rate = librosa.load(pathname, sr=conf.sampling_rate)
 
-    # trim silence
+    # trim silence, workaround: 0 length causes error, trim, top_db=default(60)
     if 0 < len(audio_array):
-        # workaround: 0 length causes error
-        # trim, top_db=default(60)
         audio_array, _ = librosa.effects.trim(audio_array)
 
     # make it unified length to conf.samples
     if len(audio_array) > conf.samples:
-
-        # long enough
+        print("Here 0")
         if trim_long_data:
-            # adding audio data to array.
+            print("Here 1")
             audio_array = audio_array[0:0 + conf.samples]
 
     # If audio not long enough, add padding on both sides of array.
     else:
+        print("Here 2")
         padding = conf.samples - len(audio_array)
         offset = padding // 2
         audio_array = np.pad(audio_array,
                              (offset, conf.samples - len(audio_array) - offset),
                              'constant')
-
     return audio_array
 
 
-def audio_array_to_melspectrogram_array(audio_array, conf=Conf):
+def audio_array_to_mel_spectrogram_array(audio_array, conf=Conf):
     """
     Extract mel-scaled spectrogram features from audio data.
 
     Parameters:
-    - audio_array (np.ndarray): Audio data in the form of a 1-D numpy array.
-    - conf (object, optional): Configuration object containing relevant parameters
+        audio_array (np.ndarray): Audio data in the form of a 1-D numpy array.
+        conf (object, optional): Configuration object containing relevant parameters
         for feature extraction. If not provided, the default configuration `conf`
         will be used.
 
     Returns:
-    - spectrogram (np.ndarray): Mel-scaled spectrogram of the input audio, with
+        spectrogram (np.ndarray): Mel-scaled spectrogram of the input audio, with
         shape (n_mels, t).
     """
     spectrogram = librosa.feature.melspectrogram(
@@ -118,7 +117,7 @@ def audio_array_to_mfcc_array(audio_array, conf=Conf):
     an array which is the MFCC of that audio array.
     Args:
         audio_array: numpy array of audio. 1D.
-        Conf: audio configurations used to read audio.
+        conf: audio configurations used to read audio.
     Returns:
         mfcc: An array that represents the mfcc of the input.
     """
@@ -156,19 +155,19 @@ def audio_array_to_chroma_array(audio_array, conf=Conf):
 
 
 def func1(num: float) -> float:
-    """Multiply the num by 2."""
+    """Multiply the num by 2. For testing purposes."""
     return num * 2
 
 
 def func2(num: float) -> float:
-    """Square the num."""
+    """Square the num. For testing purposes."""
     return num ** 2
 
 
 def main():
     # test_audio = read_audio("tests/test_data/invalid_data.wav")
-    # test_audio_2 = read_audio("tests/test_data/valid_data.wav")
-    # print(type(audio_to_melspectrogram(test_audio_2)))
+    test_audio_2 = read_audio("tests/test_data/valid_data.wav")
+    print(type(audio_array_to_mel_spectrogram_array(test_audio_2)))
     pass
 
 
