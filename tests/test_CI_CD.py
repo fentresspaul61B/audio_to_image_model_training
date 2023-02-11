@@ -1,8 +1,10 @@
 from src.packaged_logic_for_CI_CD.main import func1, func2, read_audio
 from src.packaged_logic_for_CI_CD.main import audio_array_to_mel_spectrogram_array, audio_array_to_mfcc_array
 from src.packaged_logic_for_CI_CD.main import audio_array_to_chroma_array
+from src.packaged_logic_for_CI_CD.main import stretch_image_vertically
 import numpy as np  # Use for testing arrays.
 import unittest  # Used for writing unit test.
+
 TEST_VALID_AUDIO_FILE = "tests/test_data/valid_data.wav"
 TEST_INVALID_AUDIO_FILE = "tests/test_data/invalid_data.wav"
 
@@ -40,6 +42,7 @@ class TestReadAudio(unittest.TestCase):
         with self.assertRaises(EOFError):
             audio_array = read_audio(TEST_INVALID_AUDIO_FILE)
             self.assertFalse(isinstance(audio_array, np.ndarray))
+
     pass
 
 
@@ -84,3 +87,84 @@ class TestChroma(BaseAudioRepresentationTest):
         audio_array = read_audio(TEST_VALID_AUDIO_FILE)
         chroma = audio_array_to_chroma_array(audio_array)
         self.check_representation_validity(chroma)
+
+
+def create_dummy_image(width, height, channels):
+    # create a numpy array with all zeros of the specified shape
+    img = np.zeros((height, width, channels), dtype=np.uint8)
+    return img
+
+
+class TestStretchImage(unittest.TestCase):
+    def test_output_dimensions(self):
+        """
+        This test to checks the dimensions of the output image and
+        verify that it matches the new_image_height argument and the
+        original width of the input image for each audio feature.
+        """
+        desired_height = 50
+
+        # Reading in audio file.
+        test_audio = read_audio(TEST_VALID_AUDIO_FILE)
+
+        # Creating arrays for each feature type.
+        audio_functions = [audio_array_to_mfcc_array,
+                           audio_array_to_mel_spectrogram_array,
+                           audio_array_to_chroma_array]
+
+        # computing the desired, and actual stretched shapes.
+        audio_arrays = [f(test_audio) for f in audio_functions]
+        audio_widths = [arr.shape[1] for arr in audio_arrays]
+        desired_shapes = [(desired_height, width) for width in audio_widths]
+        stretched_audio = [stretch_image_vertically(arr, desired_height) for arr in audio_arrays]
+        actual_shapes = [stretched.shape for stretched in stretched_audio]
+
+        # Validating that the desired and actual are equal.
+        for desired_shape, actual_shape in zip(desired_shapes, actual_shapes):
+            self.assertEqual(desired_shape, actual_shape)
+
+    def test_stretching(self):
+        """
+        Check for stretching: Write a test to check that the image is
+        stretched vertically as expected. This can be done by creating
+        a test image of a known shape and comparing the shape of the
+        output image to the expected result.
+        """
+
+    def test_stretch_accuracy(self):
+        """
+        Check for stretching accuracy: Write a test to check that the
+        stretching is done accurately, meaning that the aspect ratio of
+        the image is preserved. This can be done by creating an image of
+        a known aspect ratio and checking that the aspect ratio of the output
+        image is the same.
+        """
+
+    def test_stretch_edge_cases(self):
+        """
+        Check handling of edge cases: Write tests to verify that the
+        function can handle edge cases, such as an input image of height 1,
+        an input image with a width of 1, and a new_image_height of 1.
+        """
+
+    def test_stretch_negative_values(self):
+        """
+        Check for negative values: Write a test to check that the function
+        raises an error when a negative value is passed as the new_image_height
+        argument.
+        """
+
+    def test_stretch_non_integer_values(self):
+        """
+        Check for non-integer values: Write a test to check that the function
+        raises an error when a non-integer value is passed as the new_image_height
+        argument.
+        """
+
+    def test_stretch_catches_invalid_inputs(self):
+        """
+        Check for invalid inputs: Write tests to verify that the function raises
+        an error when an invalid input image is provided, such as a 1D array instead
+        of a 2D array.
+        :return:
+        """

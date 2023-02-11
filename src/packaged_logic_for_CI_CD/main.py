@@ -1,6 +1,7 @@
 import librosa
 import numpy as np
 import wave
+import cv2
 
 
 class Conf:
@@ -68,14 +69,11 @@ def read_audio(pathname, conf=Conf, trim_long_data=False):
 
     # make it unified length to conf.samples
     if len(audio_array) > conf.samples:
-        print("Here 0")
         if trim_long_data:
-            print("Here 1")
             audio_array = audio_array[0:0 + conf.samples]
 
     # If audio not long enough, add padding on both sides of array.
     else:
-        print("Here 2")
         padding = conf.samples - len(audio_array)
         offset = padding // 2
         audio_array = np.pad(audio_array,
@@ -154,6 +152,27 @@ def audio_array_to_chroma_array(audio_array, conf=Conf):
     return chroma
 
 
+def stretch_image_vertically(image_array, new_image_height):
+    """
+    This function is used to stretch_image_vertically in order to create
+    square images for training the image network. Not all the images are
+    stretched when creating the image dataset. This is used for MFCC and
+    chroma.
+    Args:
+        image_array: np.array of image values.
+        new_image_height: height dimension to stretch to. Currently,
+        I use height of 50 to stretch the images, which is arbitrary.
+    Returns:
+        image_stretched_vertically: numpy array of the resized image.
+    """
+    original_width = image_array.shape[1]
+    stretched_image_dimensions = (original_width, new_image_height)
+    image_stretched_vertically = cv2.resize(image_array,
+                                            stretched_image_dimensions,
+                                            interpolation=cv2.INTER_LINEAR)
+    return image_stretched_vertically
+
+
 def func1(num: float) -> float:
     """Multiply the num by 2. For testing purposes."""
     return num * 2
@@ -165,9 +184,7 @@ def func2(num: float) -> float:
 
 
 def main():
-    # test_audio = read_audio("tests/test_data/invalid_data.wav")
-    test_audio_2 = read_audio("tests/test_data/valid_data.wav")
-    print(type(audio_array_to_mel_spectrogram_array(test_audio_2)))
+    test_audio = "/Users/paulfentress/Desktop/audio_to_image_model_training/tests/test_data/valid_data.wav"
     pass
 
 
