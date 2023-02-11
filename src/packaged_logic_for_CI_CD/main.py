@@ -165,6 +165,9 @@ def stretch_image_vertically(image_array, new_image_height):
     Returns:
         image_stretched_vertically: numpy array of the resized image.
     """
+    if new_image_height <= 0:
+        raise ValueError("The stretch factor must be greater than 0.")
+
     original_width = image_array.shape[1]
     stretched_image_dimensions = (original_width, new_image_height)
     image_stretched_vertically = cv2.resize(image_array,

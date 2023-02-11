@@ -96,7 +96,7 @@ def create_dummy_image(width, height, channels):
 
 
 class TestStretchImage(unittest.TestCase):
-    def test_output_dimensions(self):
+    def test_stretching(self):
         """
         This test to checks the dimensions of the output image and
         verify that it matches the new_image_height argument and the
@@ -123,14 +123,6 @@ class TestStretchImage(unittest.TestCase):
         for desired_shape, actual_shape in zip(desired_shapes, actual_shapes):
             self.assertEqual(desired_shape, actual_shape)
 
-    def test_stretching(self):
-        """
-        Check for stretching: Write a test to check that the image is
-        stretched vertically as expected. This can be done by creating
-        a test image of a known shape and comparing the shape of the
-        output image to the expected result.
-        """
-
     def test_stretch_accuracy(self):
         """
         Check for stretching accuracy: Write a test to check that the
@@ -139,13 +131,29 @@ class TestStretchImage(unittest.TestCase):
         a known aspect ratio and checking that the aspect ratio of the output
         image is the same.
         """
+        # Create a dummy image of known aspect ratio
+        dummy_image = create_dummy_image(25, 50, 3)
+
+        # Stretch the dummy image vertically
+        stretched_image = stretch_image_vertically(dummy_image, 50)
+
+        # Check that the height of the stretched image is equal to the desired height
+        self.assertEqual(stretched_image.shape[0], 50)
+
+        # Check that the aspect ratio of the stretched image is equal to the original aspect ratio
+        original_aspect_ratio = dummy_image.shape[1] / dummy_image.shape[0]
+        stretched_aspect_ratio = stretched_image.shape[1] / stretched_image.shape[0]
+        self.assertAlmostEqual(original_aspect_ratio, stretched_aspect_ratio, delta=1e-6)
 
     def test_stretch_edge_cases(self):
         """
-        Check handling of edge cases: Write tests to verify that the
-        function can handle edge cases, such as an input image of height 1,
-        an input image with a width of 1, and a new_image_height of 1.
+        Verify that the function can handle edge cases, such as an input
+        image of height 1, an input image with a width of 1, and a
+        new_image_height of 1.
         """
+        tiny_image = create_dummy_image(1, 1, 3)
+        stretched_image = stretch_image_vertically(tiny_image, 50)
+        self.assertTrue(type(stretched_image) == np.ndarray)
 
     def test_stretch_negative_values(self):
         """
@@ -153,6 +161,10 @@ class TestStretchImage(unittest.TestCase):
         raises an error when a negative value is passed as the new_image_height
         argument.
         """
+        dummy_image = create_dummy_image(1, 1, 3)
+
+        with self.assertRaises(ValueError, msg="Stretch factor must be greater than 0"):
+            stretch_image_vertically(dummy_image, -50)
 
     def test_stretch_non_integer_values(self):
         """
