@@ -184,7 +184,6 @@ def func2(num: float) -> float:
 
 
 def main():
-    test_audio = "/Users/paulfentress/Desktop/audio_to_image_model_training/tests/test_data/valid_data.wav"
     pass
 
 
