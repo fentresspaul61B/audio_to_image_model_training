@@ -1,8 +1,10 @@
 from src.packaged_logic_for_CI_CD.main import func1, func2, read_audio
 from src.packaged_logic_for_CI_CD.main import audio_array_to_mel_spectrogram_array, audio_array_to_mfcc_array
 from src.packaged_logic_for_CI_CD.main import audio_array_to_chroma_array
+from src.packaged_logic_for_CI_CD.main import stretch_image_vertically
 import numpy as np  # Use for testing arrays.
 import unittest  # Used for writing unit test.
+
 TEST_VALID_AUDIO_FILE = "tests/test_data/valid_data.wav"
 TEST_INVALID_AUDIO_FILE = "tests/test_data/invalid_data.wav"
 
@@ -40,6 +42,7 @@ class TestReadAudio(unittest.TestCase):
         with self.assertRaises(EOFError):
             audio_array = read_audio(TEST_INVALID_AUDIO_FILE)
             self.assertFalse(isinstance(audio_array, np.ndarray))
+
     pass
 
 
@@ -84,3 +87,112 @@ class TestChroma(BaseAudioRepresentationTest):
         audio_array = read_audio(TEST_VALID_AUDIO_FILE)
         chroma = audio_array_to_chroma_array(audio_array)
         self.check_representation_validity(chroma)
+
+
+def create_dummy_image(width, height, channels):
+    # create a numpy array with all zeros of the specified shape
+    img = np.zeros((height, width, channels), dtype=np.uint8)
+    return img
+
+
+class TestStretchImage(unittest.TestCase):
+    def test_stretching(self):
+        """
+        This test to checks the dimensions of the output image and
+        verify that it matches the new_image_height argument and the
+        original width of the input image for each audio feature.
+        """
+        desired_height = 50
+
+        # Reading in audio file.
+        test_audio = read_audio(TEST_VALID_AUDIO_FILE)
+
+        # Creating arrays for each feature type.
+        audio_functions = [audio_array_to_mfcc_array,
+                           audio_array_to_mel_spectrogram_array,
+                           audio_array_to_chroma_array]
+
+        # computing the desired, and actual stretched shapes.
+        audio_arrays = [f(test_audio) for f in audio_functions]
+        audio_widths = [arr.shape[1] for arr in audio_arrays]
+        desired_shapes = [(desired_height, width) for width in audio_widths]
+        stretched_audio = [stretch_image_vertically(arr, desired_height) for arr in audio_arrays]
+        actual_shapes = [stretched.shape for stretched in stretched_audio]
+
+        # Validating that the desired and actual are equal.
+        for desired_shape, actual_shape in zip(desired_shapes, actual_shapes):
+            self.assertEqual(desired_shape, actual_shape)
+
+    def test_stretch_accuracy(self):
+        """
+        Check for stretching accuracy: Write a test to check that the
+        stretching is done accurately, meaning that the aspect ratio of
+        the image is preserved. This can be done by creating an image of
+        a known aspect ratio and checking that the aspect ratio of the output
+        image is the same.
+        """
+        # Create a dummy image of known aspect ratio
+        dummy_image = create_dummy_image(25, 50, 3)
+
+        # Stretch the dummy image vertically
+        stretched_image = stretch_image_vertically(dummy_image, 50)
+
+        # Check that the height of the stretched image is equal to the desired height
+        self.assertEqual(stretched_image.shape[0], 50)
+
+        # Check that the aspect ratio of the stretched image is equal to the original aspect ratio
+        original_aspect_ratio = dummy_image.shape[1] / dummy_image.shape[0]
+        stretched_aspect_ratio = stretched_image.shape[1] / stretched_image.shape[0]
+        self.assertAlmostEqual(original_aspect_ratio, stretched_aspect_ratio, delta=1e-6)
+
+    def test_stretch_edge_cases(self):
+        """
+        Verify that the function can handle edge cases, such as an input
+        image of height 1, an input image with a width of 1, and a
+        new_image_height of 1.
+        """
+        tiny_image = create_dummy_image(1, 1, 3)
+        stretched_image = stretch_image_vertically(tiny_image, 50)
+        self.assertTrue(type(stretched_image) == np.ndarray)
+
+    def test_stretch_negative_values(self):
+        """
+        Check for negative values: Write a test to check that the function
+        raises an error when a negative value is passed as the new_image_height
+        argument.
+        """
+        dummy_image = create_dummy_image(1, 1, 3)
+
+        with self.assertRaises(ValueError, msg="Stretch factor must be greater than 0"):
+            stretch_image_vertically(dummy_image, -50)
+
+        dummy_image = create_dummy_image(224, 224, 3)
+
+        with self.assertRaises(ValueError, msg="Stretch factor must be greater than 0"):
+            stretch_image_vertically(dummy_image, -0.5)
+
+    def test_stretch_non_integer_values(self):
+        """
+        Check for non-integer values: Write a test to check that the function
+        raises an error when a non-integer value is passed as the new_image_height
+        argument.
+        """
+        dummy_image = create_dummy_image(224, 224, 50)
+        with self.assertRaises(ValueError, msg="Value error: 'new_image_height' is not float or int."):
+            stretch_image_vertically(dummy_image, "50")
+
+    def test_stretch_catches_invalid_inputs(self):
+        """
+        Check for invalid inputs: Write tests to verify that the function raises
+        an error when an invalid input image is provided, such as a 1D array instead
+        of a 2D array.
+        """
+        with self.assertRaises(ValueError, msg="Value error: 'image_array' is not np.ndarray."):
+            stretch_image_vertically("image_path", 50)
+
+        dummy_image = create_dummy_image(224, 224, 50)
+        with self.assertRaises(ValueError, msg="Value error: 'image_array' is not np.ndarray."):
+            stretch_image_vertically(50, dummy_image)
+
+        with self.assertRaises(ValueError, msg="Value error: 'image_array' is not np.ndarray."):
+            stretch_image_vertically([dummy_image, dummy_image], 50)
