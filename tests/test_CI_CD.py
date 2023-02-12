@@ -177,6 +177,14 @@ class TestStretchImage(unittest.TestCase):
         raises an error when a non-integer value is passed as the new_image_height
         argument.
         """
+        dummy_image = create_dummy_image(224, 224, 50)
+        with self.assertRaises(ValueError, msg="Value error: 'new_image_height' is not float or int."):
+            stretch_image_vertically(dummy_image, "50")
+
+        with self.assertRaises(ValueError, msg="Value error: 'image_array' is not np.ndarray."):
+            stretch_image_vertically("image_path", 50)
+
+
 
     def test_stretch_catches_invalid_inputs(self):
         """

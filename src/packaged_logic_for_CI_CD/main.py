@@ -165,8 +165,15 @@ def stretch_image_vertically(image_array, new_image_height):
     Returns:
         image_stretched_vertically: numpy array of the resized image.
     """
+    if (type(new_image_height) != float) and (type(new_image_height) != int):
+        raise ValueError("Value error: 'new_image_height' is not float or int.")
+
+    if type(image_array) != np.ndarray:
+        raise ValueError("Value error: 'image_array' is not np.ndarray.")
+
     if new_image_height <= 0:
         raise ValueError("The stretch factor must be greater than 0.")
+
 
     original_width = image_array.shape[1]
     stretched_image_dimensions = (original_width, new_image_height)
