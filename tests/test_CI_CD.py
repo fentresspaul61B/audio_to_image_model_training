@@ -181,7 +181,6 @@ class TestStretchImage(unittest.TestCase):
         with self.assertRaises(ValueError, msg="Value error: 'new_image_height' is not float or int."):
             stretch_image_vertically(dummy_image, "50")
 
-
     def test_stretch_catches_invalid_inputs(self):
         """
         Check for invalid inputs: Write tests to verify that the function raises
@@ -197,4 +196,3 @@ class TestStretchImage(unittest.TestCase):
 
         with self.assertRaises(ValueError, msg="Value error: 'image_array' is not np.ndarray."):
             stretch_image_vertically([dummy_image, dummy_image], 50)
-
