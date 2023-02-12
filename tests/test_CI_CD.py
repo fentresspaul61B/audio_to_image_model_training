@@ -166,6 +166,11 @@ class TestStretchImage(unittest.TestCase):
         with self.assertRaises(ValueError, msg="Stretch factor must be greater than 0"):
             stretch_image_vertically(dummy_image, -50)
 
+        dummy_image = create_dummy_image(224, 224, 3)
+
+        with self.assertRaises(ValueError, msg="Stretch factor must be greater than 0"):
+            stretch_image_vertically(dummy_image, -0.5)
+
     def test_stretch_non_integer_values(self):
         """
         Check for non-integer values: Write a test to check that the function
